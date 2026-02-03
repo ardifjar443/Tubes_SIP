@@ -7,32 +7,28 @@ use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that is loaded on the first page visit.
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determine the current asset version.
-     */
     public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
-    /**
-     * Define the props that are shared by default.
-     *
-     * @return array<string, mixed>
-     */
     public function share(Request $request): array
     {
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? [
+                    // Kita mapping manual agar React menerimanya
+                    'id' => $request->user()->id_tenaga_medis,
+                    'name' => $request->user()->nama_tenaga_medis, // Mapping ke 'name' standar
+                    'email' => $request->user()->email,
+
+                    // INI YANG PALING PENTING:
+                    'nama_tenaga_medis' => $request->user()->nama_tenaga_medis,
+                    'jenis_tenaga_medis' => $request->user()->jenis_tenaga_medis,
+                ] : null,
             ],
         ];
     }

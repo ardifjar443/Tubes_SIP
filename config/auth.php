@@ -36,9 +36,17 @@ return [
     */
 
     'guards' => [
+        // 'web' => [
+        //     'driver' => 'session',
+        //     'provider' => 'users',
+        // ],
+        // 'tenaga_medis' => [
+        //     'driver' => 'session',
+        //     'provider' => 'tenaga_medis',
+        // ],
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'tenaga_medis_provider',
         ],
     ],
 
@@ -59,17 +67,33 @@ return [
     |
     */
 
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
+    // 'providers' => [
+    //     'users' => [
+    //         'driver' => 'eloquent',
+    //         'model' => env('AUTH_MODEL', App\Models\User::class),
+    //     ],
 
+    //     // 'users' => [
+    //     //     'driver' => 'database',
+    //     //     'table' => 'users',
+    //     // ],
+    // ],
+
+    'providers' => [
         // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\TenagaMedis::class,
         // ],
+        // 'tenaga_medis' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\TenagaMedis::class,
+        // ],
+        'tenaga_medis_provider' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\TenagaMedis::class, // Arahkan ke Model tadi
+        ],
     ],
+
 
     /*
     |--------------------------------------------------------------------------

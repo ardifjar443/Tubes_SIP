@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\TenagaMedis;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,19 +32,22 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:tenaga_medis,email',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
+        $tenagaMedis = TenagaMedis::create([
+            'nama_tenaga_medis' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'jenis_tenaga_medis' => 'dokter',   // default (bisa diubah)
+            'spesialisasi' => 'none',
+            'status_aktif' => true,
         ]);
 
-        event(new Registered($user));
+        event(new Registered($tenagaMedis));
 
-        Auth::login($user);
+        Auth::login($tenagaMedis);
 
         return redirect(route('dashboard', absolute: false));
     }
