@@ -21,24 +21,31 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        // --- 1. WRAPPER UTAMA (PENGGANTI GUESTLAYOUT) ---
-        // Ini membuat background abu-abu dan menengahkan konten secara vertikal & horizontal
+        // --- WRAPPER UTAMA ---
         <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-50">
             <Head title="Log in" />
-            {/* --- 2. KARTU LOGIN --- */}
-            <div className="w-full sm:max-w-md mt-6 px-6 py-8 bg-white shadow-lg overflow-hidden sm:rounded-xl border border-gray-100">
-                {/* --- HEADER (LOGO JAM & JUDUL) --- */}
+
+            {/* --- KARTU LOGIN --- */}
+            <div className="w-full sm:max-w-md mt-6 px-6 py-10 bg-white shadow-xl overflow-hidden sm:rounded-2xl border border-gray-100">
+                {/* --- HEADER (LOGO STETOSKOP & JUDUL) --- */}
                 <div className="mb-8 text-center">
-                    <div className="mx-auto h-12 w-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                    {/* Background Icon diganti jadi Teal */}
+                    <div className="mx-auto h-16 w-16 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-6 transition-transform hover:scale-105 duration-300">
+                        {/* ICON STETOSKOP */}
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
                             fill="currentColor"
-                            className="w-8 h-8"
+                            className="w-9 h-9"
                         >
+                            <path d="M11.7 2.805a.75.75 0 0 1 .6 0A6.065 6.065 0 0 1 22.8 8.25a.75.75 0 0 1-1.5 0 4.565 4.565 0 0 0-8.823-.75H12V11a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V7.5h-.224A4.565 4.565 0 0 0 .95 8.25a.75.75 0 0 1-1.5 0 6.065 6.065 0 0 1 10.5-5.445Z" />
+                            <path
+                                d="M12 11V7.5H9V11a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-1.5h1.5V11a3.5 3.5 0 0 1-7 0V9.5h1.5V11a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5Z"
+                                opacity="0.5"
+                            />
                             <path
                                 fillRule="evenodd"
-                                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z"
+                                d="M12 2.25a.75.75 0 0 1 .75.75v8.69l.73.73a.75.75 0 0 1-1.06 1.06l-.42-.42v4.69a3.75 3.75 0 1 1-7.5 0v-2.625a.75.75 0 0 1 1.5 0v2.625a2.25 2.25 0 0 0 4.5 0v-5.002l-.42.42a.75.75 0 0 1-1.06-1.06l.73-.73V3a.75.75 0 0 1 .75-.75Z"
                                 clipRule="evenodd"
                             />
                         </svg>
@@ -47,17 +54,17 @@ export default function Login({ status, canResetPassword }) {
                         Masuk ke YRAP Klinik
                     </h2>
                     <p className="mt-1 text-sm leading-6 text-gray-500">
-                        Sistem Informasi Penjadwalan
+                        Sistem Informasi Penjadwalan Dokter
                     </p>
                 </div>
 
                 {status && (
-                    <div className="mb-4 rounded-md bg-green-50 p-4 text-sm font-medium text-green-600 border border-green-200">
+                    <div className="mb-4 rounded-md bg-teal-50 p-4 text-sm font-medium text-teal-700 border border-teal-200">
                         {status}
                     </div>
                 )}
 
-                <form onSubmit={submit} className="space-y-5">
+                <form onSubmit={submit} className="space-y-6">
                     {/* --- EMAIL --- */}
                     <div>
                         <InputLabel
@@ -66,12 +73,13 @@ export default function Login({ status, canResetPassword }) {
                             className="text-gray-700 font-semibold"
                         />
 
+                        {/* Focus ring diganti jadi Teal */}
                         <TextInput
                             id="email"
                             type="email"
                             name="email"
                             value={data.email}
-                            className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2.5"
+                            className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm py-2.5"
                             autoComplete="username"
                             isFocused={true}
                             onChange={(e) => setData("email", e.target.value)}
@@ -94,7 +102,7 @@ export default function Login({ status, canResetPassword }) {
                             type="password"
                             name="password"
                             value={data.password}
-                            className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2.5"
+                            className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm py-2.5"
                             autoComplete="current-password"
                             onChange={(e) =>
                                 setData("password", e.target.value)
@@ -111,13 +119,14 @@ export default function Login({ status, canResetPassword }) {
                     {/* --- REMEMBER ME & FORGOT PASSWORD --- */}
                     <div className="flex items-center justify-between">
                         <label className="flex items-center">
+                            {/* Checkbox diganti jadi Teal */}
                             <Checkbox
                                 name="remember"
                                 checked={data.remember}
                                 onChange={(e) =>
                                     setData("remember", e.target.checked)
                                 }
-                                className="text-indigo-600 focus:ring-indigo-500 rounded border-gray-300"
+                                className="text-teal-600 focus:ring-teal-500 rounded border-gray-300"
                             />
                             <span className="ms-2 text-sm text-gray-600">
                                 Ingat saya
@@ -127,7 +136,7 @@ export default function Login({ status, canResetPassword }) {
                         {canResetPassword && (
                             <Link
                                 href={route("password.request")}
-                                className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                                className="text-sm font-semibold text-teal-600 hover:text-teal-500"
                             >
                                 Lupa password?
                             </Link>
@@ -136,8 +145,9 @@ export default function Login({ status, canResetPassword }) {
 
                     {/* --- BUTTON FULL WIDTH --- */}
                     <div>
+                        {/* Button diganti jadi Teal */}
                         <PrimaryButton
-                            className="flex w-full justify-center rounded-lg bg-indigo-600 px-3 py-3 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all"
+                            className="flex w-full justify-center rounded-lg bg-teal-600 px-3 py-3 text-sm font-bold leading-6 text-white shadow-sm hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 transition-all duration-200"
                             disabled={processing}
                         >
                             {processing ? "Memproses..." : "Masuk"}
@@ -145,6 +155,12 @@ export default function Login({ status, canResetPassword }) {
                     </div>
                 </form>
             </div>
+
+            {/* Footer kecil opsional untuk mempercantik */}
+            <p className="mt-8 text-center text-xs text-gray-400">
+                &copy; {new Date().getFullYear()} YRAP Klinik. All rights
+                reserved.
+            </p>
         </div>
     );
 }

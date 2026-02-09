@@ -1,47 +1,190 @@
-import { Link, router, usePage } from "@inertiajs/react";
+import React, { useState, useMemo } from "react";
+import { Link, router, usePage, Head } from "@inertiajs/react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "moment/locale/id";
+
+// Setup Moment
+moment.locale("id");
+const localizer = momentLocalizer(moment);
 
 // --- KOMPONEN KARTU MENU ---
-const MenuCard = ({ title, description, href, icon, colorClass }) => (
+const MenuCard = ({
+    title,
+    description,
+    href,
+    icon,
+    colorClass,
+    hoverClass,
+}) => (
     <Link
         href={href}
-        className={`relative overflow-hidden p-6 rounded-2xl shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl group bg-white border border-gray-100`}
+        className={`relative overflow-hidden p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group bg-white border border-gray-100 block w-full h-full`}
     >
-        <div
-            className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity ${colorClass}`}
-        >
-            {icon}
-        </div>
-        <div className="relative z-10">
+        <div className="flex items-start gap-3">
             <div
-                className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${colorClass} bg-opacity-10 text-current`}
+                className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${colorClass} bg-opacity-10 text-current`}
             >
-                <div className="w-6 h-6">{icon}</div>
+                <div className="w-4 h-4">{icon}</div>
             </div>
-            <h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
-                {title}
-            </h3>
-            <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                {description}
-            </p>
+            <div>
+                <h3
+                    className={`text-sm font-bold text-gray-800 ${hoverClass || "group-hover:text-teal-600"} transition-colors`}
+                >
+                    {title}
+                </h3>
+                <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">
+                    {description}
+                </p>
+            </div>
         </div>
     </Link>
 );
 
 // --- KOMPONEN STATISTIK ---
 const StatCard = ({ label, value, color }) => (
-    <div className="bg-white p-6 rounded-2xl shadow border border-gray-100 flex items-center justify-between">
+    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between h-full">
         <div>
-            <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
                 {label}
             </p>
-            <p className="text-2xl font-bold text-gray-800 mt-1">{value}</p>
+            <p className="text-xl font-bold text-gray-800 mt-1">{value}</p>
         </div>
-        <div className={`w-3 h-full ${color} rounded-full`}></div>
+        <div className={`w-1.5 h-6 ${color} rounded-full opacity-80`}></div>
     </div>
 );
 
+// --- KOMPONEN APPROVAL LIST ---
+const ApprovalCard = ({ cuti }) => {
+    const handleAction = (status) => {
+        if (
+            confirm(
+                `Yakin ingin ${status === "approved" ? "menyetujui" : "menolak"} pengajuan ini?`,
+            )
+        ) {
+            router.put(
+                route("cuti.updateStatus", cuti.id_cuti),
+                {
+                    status: status,
+                },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => alert("Status berhasil diperbarui!"),
+                },
+            );
+        }
+    };
+
+    return (
+        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex justify-between items-start mb-2">
+                <div>
+                    <h4 className="font-bold text-gray-800 text-sm">
+                        {cuti.tenaga_medis?.nama_tenaga_medis}
+                    </h4>
+                    <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded capitalize">
+                        {cuti.jenis_cuti}
+                    </span>
+                </div>
+                <div className="text-right">
+                    <span className="text-[10px] text-gray-400 block">
+                        Mulai
+                    </span>
+                    <span className="text-xs font-semibold text-teal-600">
+                        {moment(cuti.tanggal_mulai).format("DD MMM")}
+                    </span>
+                </div>
+            </div>
+
+            {cuti.keterangan && (
+                <p className="text-xs text-gray-500 italic mb-3 border-l-2 border-gray-300 pl-2 line-clamp-2">
+                    "{cuti.keterangan}"
+                </p>
+            )}
+
+            <div className="grid grid-cols-2 gap-2 mt-2">
+                <button
+                    onClick={() => handleAction("rejected")}
+                    className="flex items-center justify-center gap-1 px-2 py-1.5 bg-red-50 text-red-600 text-xs font-bold rounded-lg hover:bg-red-600 hover:text-white transition-colors"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="w-3 h-3"
+                    >
+                        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                    </svg>
+                    Tolak
+                </button>
+                <button
+                    onClick={() => handleAction("approved")}
+                    className="flex items-center justify-center gap-1 px-2 py-1.5 bg-teal-50 text-teal-600 text-xs font-bold rounded-lg hover:bg-teal-600 hover:text-white transition-colors"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="w-3 h-3"
+                    >
+                        <path
+                            fillRule="evenodd"
+                            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                            clipRule="evenodd"
+                        />
+                    </svg>
+                    Setujui
+                </button>
+            </div>
+        </div>
+    );
+};
+
+// --- KOMPONEN EVENT KALENDER ---
+const CustomEventComponent = ({ event }) => {
+    const spesialisasi = (event.spesialisasi || "").toLowerCase();
+    const isGigi = spesialisasi.includes("gigi");
+
+    return (
+        <div className="flex flex-col justify-start px-1 py-0.5 leading-tight h-full overflow-hidden">
+            <div className="flex justify-between items-center mb-0.5">
+                <span className="text-[10px] font-bold text-white/90">
+                    {moment(event.start).format("HH:mm")}
+                </span>
+                {isGigi ? (
+                    <span className="bg-pink-500 text-white text-[8px] font-extrabold px-1 rounded-sm shadow-sm">
+                        GIGI
+                    </span>
+                ) : (
+                    <span className="bg-blue-500 text-white text-[8px] font-bold px-1 rounded-sm">
+                        UMUM
+                    </span>
+                )}
+            </div>
+            <div className="text-[10px] font-medium truncate text-white">
+                {event.title}
+            </div>
+        </div>
+    );
+};
+
 // --- IKON SVG ---
 const Icons = {
+    Stethoscope: (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-6 h-6"
+        >
+            <path d="M11.7 2.805a.75.75 0 0 1 .6 0A6.065 6.065 0 0 1 22.8 8.25a.75.75 0 0 1-1.5 0 4.565 4.565 0 0 0-8.823-.75H12V11a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V7.5h-.224A4.565 4.565 0 0 0 .95 8.25a.75.75 0 0 1-1.5 0 6.065 6.065 0 0 1 10.5-5.445Z" />
+            <path
+                d="M12 11V7.5H9V11a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-1.5h1.5V11a3.5 3.5 0 0 1-7 0V9.5h1.5V11a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5Z"
+                opacity="0.5"
+            />
+        </svg>
+    ),
     Users: (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -117,22 +260,6 @@ const Icons = {
             />
         </svg>
     ),
-    Clipboard: (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"
-            />
-        </svg>
-    ),
-    // --- ICON BARU: BOOK (Untuk Regulasi) ---
     Book: (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +277,7 @@ const Icons = {
     ),
 };
 
-export default function Dashboard() {
+export default function Dashboard({ jadwal = [], cutiPending = [] }) {
     const { props } = usePage();
     const auth = props.auth || {};
     const user = auth.user || {};
@@ -160,9 +287,90 @@ export default function Dashboard() {
         perawat: 0,
         aktif: 0,
     };
-
     const role = user?.jenis_tenaga_medis?.toLowerCase();
     const nama = user?.nama_tenaga_medis || user?.name || "User";
+
+    const [viewMode, setViewMode] = useState(
+        role === "kepala klinik" ? "all" : "mine",
+    );
+
+    // --- TRANSFORM DATA JADWAL ---
+    const events = useMemo(() => {
+        return jadwal
+            .map((item) => {
+                const tanggal = item.shift_harian?.tanggal;
+                const shift = item.shift_harian?.shift;
+                if (!tanggal || !shift) return null;
+                return {
+                    id: item.id,
+                    title: `${item.tenaga_medis.nama_tenaga_medis}`,
+                    start: new Date(`${tanggal}T${shift.jam_mulai}`),
+                    end: new Date(`${tanggal}T${shift.jam_selesai}`),
+                    resource: item,
+                    ownerId: item.tenaga_medis.id_tenaga_medis,
+                    status: item.shift_harian?.periode?.status || "aktif",
+                    spesialisasi: item.tenaga_medis.spesialisasi,
+                };
+            })
+            .filter(Boolean);
+    }, [jadwal]);
+
+    // --- LOGIKA HITUNG TOTAL JADWAL ---
+    const totalJadwalBulanIni = useMemo(() => {
+        const currentMonth = moment().month();
+        const currentYear = moment().year();
+
+        return events.filter((event) => {
+            const eventDate = moment(event.start);
+            const isCurrentMonth =
+                eventDate.month() === currentMonth &&
+                eventDate.year() === currentYear;
+
+            if (role === "dokter") {
+                const myId = auth.user.id_tenaga_medis || auth.user.id;
+                return isCurrentMonth && event.ownerId == myId;
+            }
+            return isCurrentMonth;
+        }).length;
+    }, [events, role, auth.user]);
+
+    // --- FILTER KALENDER ---
+    const displayedEvents = events.filter((event) => {
+        if (viewMode === "mine") {
+            const myId = auth.user.id_tenaga_medis || auth.user.id;
+            return event.ownerId == myId;
+        }
+        return true;
+    });
+
+    const eventStyleGetter = (event) => {
+        const myId = auth.user.id_tenaga_medis || auth.user.id;
+        const isMine = event.ownerId == myId;
+        let bgColor = "#0d9488";
+
+        switch (event.status) {
+            case "aktif":
+                bgColor = "#0d9488";
+                break;
+            case "draft":
+                bgColor = "#d97706";
+                break;
+            default:
+                bgColor = "#3b82f6";
+        }
+
+        return {
+            style: {
+                backgroundColor: bgColor,
+                color: "#ffffff",
+                borderRadius: "4px",
+                border: isMine ? "2px solid #ffffff" : "0px",
+                opacity: isMine ? 1 : 0.85,
+                display: "block",
+                boxShadow: isMine ? "0 2px 4px rgba(0,0,0,0.2)" : "none",
+            },
+        };
+    };
 
     const handleLogout = () => {
         router.post(route("logout"));
@@ -170,15 +378,28 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans">
+            <Head title="Dashboard" />
+
+            <style>{`
+                .rbc-calendar { font-family: 'Figtree', sans-serif; }
+                .rbc-header { padding: 8px 0; font-size: 0.75rem; font-weight: 700; background-color: #f0fdfa; color: #115e59; }
+                .rbc-date-cell { font-size: 0.75rem; font-weight: 600; padding: 4px; color: #374151; }
+                .rbc-event { min-height: auto !important; padding: 1px !important; }
+                .rbc-month-row { overflow-y: visible !important; }
+                .rbc-today { background-color: #ecfdf5; }
+                .rbc-toolbar span { font-size: 0.8rem; }
+                .rbc-toolbar button { font-size: 0.75rem; padding: 4px 8px; }
+            `}</style>
+
             {/* ===== HEADER ===== */}
             <header className="bg-white shadow-sm sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div className="max-w-[95%] mx-auto px-4 py-3 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="bg-indigo-600 text-white p-2 rounded-lg">
-                            {Icons.Sparkles}
+                        <div className="bg-teal-600 text-white p-2 rounded-lg shadow-sm">
+                            {Icons.Stethoscope}
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-800 leading-tight">
+                            <h1 className="text-lg font-bold text-gray-800 leading-tight">
                                 SIP Klinik
                             </h1>
                             <p className="text-xs text-gray-500">
@@ -186,13 +407,12 @@ export default function Dashboard() {
                             </p>
                         </div>
                     </div>
-
                     <div className="flex items-center gap-4">
                         <div className="text-right hidden md:block">
                             <p className="text-sm font-semibold text-gray-700">
                                 {nama}
                             </p>
-                            <span className="inline-block bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full capitalize">
+                            <span className="inline-block bg-teal-50 text-teal-700 text-xs px-2 py-0.5 rounded-full capitalize border border-teal-100">
                                 {role || "Guest"}
                             </span>
                         </div>
@@ -206,151 +426,242 @@ export default function Dashboard() {
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto p-6 space-y-8">
-                {/* ===== SECTION 1: STATS ===== */}
-                {(role === "admin" || role === "kepala klinik") && (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <StatCard
-                            label="Total Staff"
-                            value={stats.totalTenagaMedis}
-                            color="bg-blue-500"
-                        />
-                        <StatCard
-                            label="Dokter"
-                            value={stats.dokter}
-                            color="bg-teal-500"
-                        />
-                        <StatCard
-                            label="Perawat"
-                            value={stats.perawat}
-                            color="bg-purple-500"
-                        />
-                        <StatCard
-                            label="Staff Aktif"
-                            value={stats.aktif}
-                            color="bg-green-500"
-                        />
+            <main className="max-w-[95%] mx-auto py-6 space-y-6">
+                {/* ===== SECTION 1: TOP SUMMARY ===== */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* GREETING */}
+                    <div className="lg:col-span-2 bg-gradient-to-r from-teal-600 to-emerald-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col justify-center">
+                        <div className="relative z-10">
+                            <h2 className="text-2xl font-bold mb-1">
+                                Halo, {nama}! 👋
+                            </h2>
+                            <p className="text-teal-50 text-sm opacity-90">
+                                {role === "dokter"
+                                    ? "Berikut adalah ringkasan jadwal praktek Anda hari ini."
+                                    : "Selamat datang di dashboard manajemen klinik."}
+                            </p>
+                        </div>
+                        <div className="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12"></div>
                     </div>
-                )}
 
-                {/* ===== SECTION 2: GREETING ===== */}
-                <div className="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-                    <div className="relative z-10">
-                        <h2 className="text-3xl font-bold mb-2">
-                            Halo, {nama}! 👋
-                        </h2>
-                        <p className="text-indigo-100 max-w-xl">
-                            {role === "dokter"
-                                ? "Selamat bertugas. Silakan cek jadwal praktek atau ajukan cuti melalui menu di bawah."
-                                : "Selamat datang di dashboard manajemen klinik."}
-                        </p>
+                    {/* STATS SUMMARY */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col justify-center">
+                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
+                                Total Jadwal Bulan Ini
+                            </p>
+                            <p className="text-3xl font-bold text-teal-600 mt-2">
+                                {totalJadwalBulanIni}
+                                <span className="text-sm text-gray-400 font-normal ml-1">
+                                    Sesi
+                                </span>
+                            </p>
+                        </div>
                     </div>
-                    <div className="absolute right-0 top-0 h-full w-1/3 bg-white opacity-5 transform skew-x-12"></div>
                 </div>
 
-                {/* ===== SECTION 3: MENU GRID ===== */}
-                <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                        <span>Menu Utama</span>
-                    </h3>
+                {/* ===== SECTION 2: MAIN CONTENT (3 COLUMN LAYOUT) ===== */}
+                {/* Grid 12 Kolom */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    {/* --- KIRI: MENU SIDEBAR --- */}
+                    {/* Jika Admin: Full Width (karena kalender hidden), Jika Lain: 25% */}
+                    <div
+                        className={`${role === "admin" ? "lg:col-span-12" : "lg:col-span-3"} space-y-4`}
+                    >
+                        <div className="flex items-center gap-2 mb-2">
+                            <h3 className="text-lg font-bold text-gray-800">
+                                Menu Utama
+                            </h3>
+                        </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {/* 1. ROLE: ADMIN (Hanya Tenaga Medis) */}
-                        {role === "admin" && (
-                            <>
+                        {/* Grid container untuk menu admin agar horizontal, vertical untuk yg lain */}
+                        <div
+                            className={`${role === "admin" ? "grid grid-cols-1 sm:grid-cols-3 gap-4" : "space-y-3"}`}
+                        >
+                            {role === "admin" && (
                                 <MenuCard
                                     title="Data Tenaga Medis"
-                                    description="Tambah, edit, dan kelola data dokter & perawat."
+                                    description="Kelola data dokter & perawat."
                                     href={route("tenaga-medis.index")}
                                     icon={Icons.Users}
-                                    colorClass="text-blue-600 bg-blue-50"
-                                />
-                            </>
-                        )}
-
-                        {/* 2. ROLE: DOKTER (Jadwal, Pengajuan Cuti, Riwayat Cuti) */}
-                        {role === "dokter" && (
-                            <>
-                                <MenuCard
-                                    title="Jadwal Saya"
-                                    description="Lihat kalender jadwal praktek pribadi Anda."
-                                    href={route("jadwal.index")}
-                                    icon={Icons.Calendar}
-                                    colorClass="text-green-600 bg-green-50"
-                                />
-                                <MenuCard
-                                    title="Pengajuan Cuti"
-                                    description="Ajukan permohonan cuti baru."
-                                    href={route("cuti.create")}
-                                    icon={Icons.Briefcase}
-                                    colorClass="text-teal-600 bg-teal-50"
-                                />
-                                <MenuCard
-                                    title="Riwayat Cuti"
-                                    description="Lihat status pengajuan cuti Anda."
-                                    href={route("cuti.index")}
-                                    icon={Icons.Clipboard}
-                                    colorClass="text-orange-600 bg-orange-50"
-                                />
-                            </>
-                        )}
-
-                        {/* 3. ROLE: KEPALA KLINIK */}
-                        {role === "kepala klinik" && (
-                            <>
-                                {/* Manajemen Jadwal */}
-                                <MenuCard
-                                    title="Jadwal Dokter"
-                                    description="Lihat seluruh jadwal klinik dan detailnya."
-                                    href={route("jadwal.index")}
-                                    icon={Icons.Calendar}
-                                    colorClass="text-indigo-600 bg-indigo-50"
-                                />
-                                {/* Kelola Shift */}
-                                <MenuCard
-                                    title="Kelola Shift"
-                                    description="Atur jam kerja dan pembagian shift."
-                                    href={route("shift.index")}
-                                    icon={Icons.Clock}
-                                    colorClass="text-pink-600 bg-pink-50"
-                                />
-                                {/* Approval Cuti */}
-                                <MenuCard
-                                    title="Approval Cuti"
-                                    description="Setujui atau tolak pengajuan cuti staff."
-                                    href={route("cuti.index")}
-                                    icon={Icons.Briefcase}
-                                    colorClass="text-purple-600 bg-purple-50"
-                                />
-                                {/* --- MENU BARU: REGULASI --- */}
-                                <MenuCard
-                                    title="Regulasi Klinik"
-                                    description="Atur batasan jam kerja dan aturan penjadwalan."
-                                    href={route("regulasi.show")}
-                                    icon={Icons.Book}
                                     colorClass="text-cyan-600 bg-cyan-50"
                                 />
+                            )}
 
-                                {/* Generate Jadwal */}
-                                <div
-                                    className="p-6 rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center hover:border-indigo-500 hover:bg-indigo-50 transition cursor-pointer group"
-                                    onClick={() =>
-                                        router.post(route("jadwal.generate"))
-                                    }
-                                >
-                                    <div className="text-indigo-400 group-hover:text-indigo-600 mb-2">
-                                        {Icons.Sparkles}
+                            {role === "dokter" && (
+                                <>
+                                    <MenuCard
+                                        title="Pengajuan Cuti"
+                                        description="Ajukan permohonan cuti."
+                                        href={route("cuti.create")}
+                                        icon={Icons.Briefcase}
+                                        colorClass="text-emerald-600 bg-emerald-50"
+                                    />
+                                    <MenuCard
+                                        title="Riwayat Cuti"
+                                        description="Cek status pengajuan."
+                                        href={route("cuti.index")}
+                                        icon={Icons.Clipboard}
+                                        colorClass="text-orange-500 bg-orange-50"
+                                    />
+                                </>
+                            )}
+
+                            {role === "kepala klinik" && (
+                                <>
+                                    <MenuCard
+                                        title="Kelola Shift"
+                                        description="Atur jam kerja shift."
+                                        href={route("shift.index")}
+                                        icon={Icons.Clock}
+                                        colorClass="text-cyan-600 bg-cyan-50"
+                                    />
+                                    <MenuCard
+                                        title="Approval Cuti"
+                                        description="Validasi cuti staff."
+                                        href={route("cuti.index")}
+                                        icon={Icons.Briefcase}
+                                        colorClass="text-emerald-600 bg-emerald-50"
+                                    />
+                                    <MenuCard
+                                        title="Regulasi Klinik"
+                                        description="Atur batasan aturan."
+                                        href={route("regulasi.show")}
+                                        icon={Icons.Book}
+                                        colorClass="text-blue-600 bg-blue-50"
+                                    />
+                                    <div
+                                        className="p-4 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center hover:border-teal-500 hover:bg-teal-50 transition cursor-pointer group py-6 h-full"
+                                        onClick={() =>
+                                            router.post(
+                                                route("jadwal.generate"),
+                                            )
+                                        }
+                                    >
+                                        <div className="text-teal-400 group-hover:text-teal-600 mb-1">
+                                            {Icons.Sparkles}
+                                        </div>
+                                        <span className="font-bold text-sm text-gray-600 group-hover:text-teal-700">
+                                            Generate Jadwal
+                                        </span>
                                     </div>
-                                    <span className="font-bold text-gray-600 group-hover:text-indigo-700">
-                                        Generate Otomatis
-                                    </span>
-                                    <span className="text-xs text-gray-400 mt-1">
-                                        Buat jadwal bulan depan
-                                    </span>
-                                </div>
-                            </>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Statistik Bawah Menu (Untuk Admin & Kepala Klinik) */}
+                        {/* Jika Admin, tampilkan Grid Horizontal */}
+                        {(role === "admin" || role === "kepala klinik") && (
+                            <div
+                                className={`mt-6 pt-6 border-t border-gray-100 ${role === "admin" ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : "space-y-3"}`}
+                            >
+                                {role !== "admin" && (
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                        Statistik Klinik
+                                    </h4>
+                                )}
+
+                                <StatCard
+                                    label="Dokter"
+                                    value={stats.dokter}
+                                    color="bg-teal-500"
+                                />
+                                {/* <StatCard label="Perawat" value={stats.perawat} color="bg-emerald-500" /> */}
+                            </div>
                         )}
                     </div>
+
+                    {/* --- TENGAH: KALENDER (50%) - HIDDEN IF ADMIN --- */}
+                    {role !== "admin" && (
+                        <div className="lg:col-span-6">
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                                <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
+                                    <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
+                                        {Icons.Calendar}{" "}
+                                        <span className="w-2"></span> Kalender
+                                        Jadwal
+                                    </h3>
+
+                                    <div className="flex bg-gray-100 p-1 rounded-lg">
+                                        <button
+                                            onClick={() => setViewMode("all")}
+                                            className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${viewMode === "all" ? "bg-white text-teal-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                        >
+                                            Semua
+                                        </button>
+                                        <button
+                                            onClick={() => setViewMode("mine")}
+                                            className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${viewMode === "mine" ? "bg-white text-teal-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                        >
+                                            Saya
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div style={{ height: "600px" }}>
+                                    <Calendar
+                                        localizer={localizer}
+                                        events={displayedEvents}
+                                        startAccessor="start"
+                                        endAccessor="end"
+                                        style={{ height: "100%" }}
+                                        eventPropGetter={eventStyleGetter}
+                                        components={{
+                                            event: CustomEventComponent,
+                                        }}
+                                        culture="id"
+                                        messages={{
+                                            next: ">",
+                                            previous: "<",
+                                            today: "Hari Ini",
+                                            month: "Bln",
+                                            week: "Mgg",
+                                            day: "Hr",
+                                            noEventsInRange: "Kosong",
+                                            showMore: (total) => `+${total}`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- KANAN: APPROVAL LIST (25%) --- */}
+                    {/* Hanya Tampil Untuk Kepala Klinik */}
+                    {role === "kepala klinik" && (
+                        <div className="lg:col-span-3 space-y-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <h3 className="text-lg font-bold text-gray-800">
+                                    Menunggu Approval
+                                </h3>
+                                {cutiPending.length > 0 && (
+                                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        {cutiPending.length}
+                                    </span>
+                                )}
+                            </div>
+
+                            {cutiPending.length === 0 ? (
+                                <div className="bg-white p-8 rounded-xl border border-gray-100 text-center">
+                                    <div className="text-gray-300 mb-2 flex justify-center">
+                                        {Icons.Briefcase}
+                                    </div>
+                                    <p className="text-sm text-gray-500 font-medium">
+                                        Tidak ada pengajuan baru.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3 max-h-[700px] overflow-y-auto pr-1 custom-scrollbar">
+                                    {cutiPending.map((cuti) => (
+                                        <ApprovalCard
+                                            key={cuti.id_cuti}
+                                            cuti={cuti}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

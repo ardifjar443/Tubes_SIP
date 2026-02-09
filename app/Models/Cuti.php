@@ -17,6 +17,7 @@ class Cuti extends Model
         'status',
         'approved_by',
         'approved_at',
+        'keterangan'
     ];
 
     public function tenagaMedis()

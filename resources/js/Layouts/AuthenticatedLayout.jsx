@@ -5,19 +5,19 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage } from "@inertiajs/react";
 import { useState } from "react";
 
+// --- IKON STETOSKOP (Sama seperti Dashboard) ---
 const Icons = {
-    Sparkles: (
+    Stethoscope: (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            fill="none"
             viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
+            fill="currentColor"
+            className="w-6 h-6"
         >
+            <path d="M11.7 2.805a.75.75 0 0 1 .6 0A6.065 6.065 0 0 1 22.8 8.25a.75.75 0 0 1-1.5 0 4.565 4.565 0 0 0-8.823-.75H12V11a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V7.5h-.224A4.565 4.565 0 0 0 .95 8.25a.75.75 0 0 1-1.5 0 6.065 6.065 0 0 1 10.5-5.445Z" />
             <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+                d="M12 11V7.5H9V11a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-1.5h1.5V11a3.5 3.5 0 0 1-7 0V9.5h1.5V11a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5Z"
+                opacity="0.5"
             />
         </svg>
     ),
@@ -44,8 +44,9 @@ export default function AuthenticatedLayout({ header, children }) {
                             <div className="flex shrink-0 items-center">
                                 <Link href={route("dashboard")}>
                                     <div className="flex items-center gap-3">
-                                        <div className="bg-indigo-600 text-white p-2 rounded-lg w-9 h-9 flex items-center justify-center">
-                                            {Icons.Sparkles}
+                                        {/* Ubah Background Logo jadi TEAL */}
+                                        <div className="bg-teal-600 text-white p-2 rounded-lg w-10 h-10 flex items-center justify-center shadow-sm hover:bg-teal-700 transition">
+                                            {Icons.Stethoscope}
                                         </div>
                                         <div>
                                             <h1 className="text-xl font-bold text-gray-800 leading-tight hidden md:block">
@@ -57,6 +58,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
 
                             {/* NAVIGATION LINKS (DESKTOP) */}
+                            {/* Pastikan komponen NavLink Anda juga mendukung active color yang sesuai, biasanya defaultnya gray/black */}
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 {/* 1. SEMUA USER: Dashboard */}
                                 <NavLink
@@ -66,7 +68,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Dashboard
                                 </NavLink>
 
-                                {/* 2. KHUSUS ADMIN: Tenaga Medis Saja (Shift dipindah) */}
+                                {/* 2. KHUSUS ADMIN: Tenaga Medis */}
                                 {role === "admin" && (
                                     <NavLink
                                         href={route("tenaga-medis.index")}
@@ -106,7 +108,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </>
                                 )}
 
-                                {/* 4. KHUSUS KEPALA KLINIK: Jadwal, Shift, Cuti, Regulasi */}
+                                {/* 4. KHUSUS KEPALA KLINIK: Manajemen Lengkap */}
                                 {role === "kepala klinik" && (
                                     <>
                                         <NavLink
@@ -148,29 +150,32 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                                className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white pl-4 pr-2 py-1 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none shadow-sm"
                                             >
-                                                <div className="text-right mr-2">
-                                                    <div className="font-bold">
+                                                <div className="text-right">
+                                                    <div className="font-bold text-gray-700">
                                                         {user.name}
                                                     </div>
-                                                    <div className="text-xs font-normal text-gray-400 capitalize">
+                                                    {/* Role Badge: Teal Light */}
+                                                    <div className="text-[10px] uppercase tracking-wider font-bold text-teal-600">
                                                         {role}
                                                     </div>
                                                 </div>
 
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
+                                                <div className="h-8 w-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24"
+                                                        fill="currentColor"
+                                                        className="w-5 h-5"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </div>
                                             </button>
                                         </span>
                                     </Dropdown.Trigger>
@@ -185,6 +190,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route("logout")}
                                             method="post"
                                             as="button"
+                                            className="text-red-600 hover:bg-red-50"
                                         >
                                             Log Out
                                         </Dropdown.Link>
@@ -241,7 +247,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div
                     className={
                         (showingNavigationDropdown ? "block" : "hidden") +
-                        " sm:hidden"
+                        " sm:hidden border-t border-gray-100"
                     }
                 >
                     <div className="space-y-1 pb-3 pt-2">
@@ -318,13 +324,18 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
 
                     {/* MOBILE USER INFO */}
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
+                    <div className="border-t border-gray-200 pb-1 pt-4 bg-gray-50">
+                        <div className="px-4 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold text-lg">
+                                {user.name.charAt(0)}
                             </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
+                            <div>
+                                <div className="text-base font-medium text-gray-800">
+                                    {user.name}
+                                </div>
+                                <div className="text-sm font-medium text-gray-500">
+                                    {user.email}
+                                </div>
                             </div>
                         </div>
 
@@ -336,6 +347,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 method="post"
                                 href={route("logout")}
                                 as="button"
+                                className="text-red-600"
                             >
                                 Log Out
                             </ResponsiveNavLink>
